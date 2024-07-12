@@ -35,7 +35,7 @@ class Net(Module):
             lr (float): Learning rate for the optimizer.
         """
         super(Net, self).__init__()
-        self.MODEL_NAME = "LSTM_Timeseries_Annotator"
+        self.MODEL_NAME = "LSTM_TimeStepClassifier"
 
         self.feat_dim = feat_dim
         self.encode_len = encode_len
