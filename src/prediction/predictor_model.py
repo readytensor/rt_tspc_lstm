@@ -5,7 +5,6 @@ import warnings
 import joblib
 import numpy as np
 from .NNet_model import Net
-from . import NNet_model as NNet_utils
 from sklearn.exceptions import NotFittedError
 from multiprocessing import cpu_count
 from sklearn.metrics import f1_score
