@@ -11,7 +11,7 @@ from multiprocessing import cpu_count
 from sklearn.metrics import f1_score
 from schema.data_schema import TimeStepClassificationSchema
 from typing import Tuple
-import torch 
+import torch
 
 
 warnings.filterwarnings("ignore")
@@ -31,6 +31,7 @@ device = torch.device(
 )
 print("device used: ", device)
 
+
 def control_randomness(seed: int = 42):
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -39,6 +40,7 @@ def control_randomness(seed: int = 42):
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
 
 class TimeStepClassifier:
     """LSTM TimeStepClassifier.
@@ -56,7 +58,7 @@ class TimeStepClassifier:
         padding_value: float,
         max_epochs: int = 100,
         lr: float = 1e-3,
-        batch_size:int = 64,
+        batch_size: int = 64,
         random_state: int = 42,
         **kwargs,
     ):
@@ -115,7 +117,7 @@ class TimeStepClassifier:
                     f" length on axis 1. Found length {T}"
                 )
             # we excluded the first 2 dimensions (id, time) and the last dimension (target)
-            X = data[:, :, 2:-1] # shape = [N, T, D]
+            X = data[:, :, 2:-1]  # shape = [N, T, D]
             y = data[:, :, -1].astype(int)  # shape = [N, T]
         else:
             # for inference
@@ -131,7 +133,13 @@ class TimeStepClassifier:
     def fit(self, train_data):
         train_X, train_y = self._get_X_and_y(train_data, is_train=True)
 
-        self.net.fit(train_X, train_y, max_epochs=self.max_epochs, batch_size=self.batch_size, verbose=1)
+        self.net.fit(
+            train_X,
+            train_y,
+            max_epochs=self.max_epochs,
+            batch_size=self.batch_size,
+            verbose=1,
+        )
 
         self._is_trained = True
         return self.net
@@ -141,8 +149,7 @@ class TimeStepClassifier:
 
         preds = self.net.predict_proba(X)
         preds = np.array(preds)
-        if preds.shape[2] == 2:
-            preds[..., [0, 1]] = preds[..., [1, 0]]
+
         prob_dict = {}
 
         for index, prediction in enumerate(preds):
@@ -266,7 +273,9 @@ def load_predictor_model(predictor_dir_path: str) -> TimeStepClassifier:
     return TimeStepClassifier.load(predictor_dir_path)
 
 
-def evaluate_predictor_model(model: TimeStepClassifier, test_split: np.ndarray) -> float:
+def evaluate_predictor_model(
+    model: TimeStepClassifier, test_split: np.ndarray
+) -> float:
     """
     Evaluate the TimeStepClassifier model and return the r-squared value.
 
